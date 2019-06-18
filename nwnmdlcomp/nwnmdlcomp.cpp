@@ -95,7 +95,7 @@ typedef void (FN_EBMCALLBACK) (const CNwnKeyFile::Resource *psRes,
 // @rdesc None.
 //
 //-----------------------------------------------------------------------------
-
+	/* Mord and Symphony
 void EnumBinaryModels (FN_EBMCALLBACK *pfnCallback)
 {
 	CNwnKeyFile &sKeyFile = *g_sLoader .GetNthKeyFile (0);
@@ -165,7 +165,7 @@ void EnumBinaryModels (FN_EBMCALLBACK *pfnCallback)
 		pfnCallback (psRes, pauchData, ulSize, fAllocated);
 	}
 }
-
+*/
 //-----------------------------------------------------------------------------
 //
 // @func Callback for test 1
@@ -181,7 +181,7 @@ void EnumBinaryModels (FN_EBMCALLBACK *pfnCallback)
 // @rdesc None.
 //
 //-----------------------------------------------------------------------------
-
+	/*
 void Test1Callback (const CNwnKeyFile::Resource *psRes,
 	unsigned char *pauchData, UINT32 ulSize, bool fAllocated)
 {
@@ -192,7 +192,7 @@ void Test1Callback (const CNwnKeyFile::Resource *psRes,
 		sMdl .GetModelData (), sMdl .GetRawData ());
 	printf ("Passed\n");
 }
-
+*/
 //-----------------------------------------------------------------------------
 //
 // @func Callback for test 2
@@ -208,7 +208,7 @@ void Test1Callback (const CNwnKeyFile::Resource *psRes,
 // @rdesc None.
 //
 //-----------------------------------------------------------------------------
-
+	/*
 void Test2Callback (const CNwnKeyFile::Resource *psRes,
 	unsigned char *pauchData, UINT32 ulSize, bool fAllocated)
 {
@@ -376,7 +376,7 @@ void Test2Callback (const CNwnKeyFile::Resource *psRes,
 	else
 		printf ("Passed\n");
 }
-
+*/
 //-----------------------------------------------------------------------------
 //
 // @func Make output file name
@@ -545,9 +545,9 @@ bool Compile (unsigned char *pauchData, UINT32 ulSize,
 	// Compile
 	//
 
-	CNmcContext sCtx;
-	for (int i = 0; i < (int) g_sLoader .GetKeyFileCount (); i++)
-		sCtx .AddKeyFile (g_sLoader .GetNthKeyFile (i));
+	CNmcContext sCtx; //Mord and Symphony
+	// for (int i = 0; i < (int) g_sLoader .GetKeyFileCount (); i++)
+	//	sCtx .AddKeyFile (g_sLoader .GetNthKeyFile (i));
 	sCtx .SetCache (&g_sCache);
 	sCtx .SetPurgeNullFaces (g_fPurgeNullFaces);
 	CNwnMemoryStream *pStream = new 
@@ -1107,7 +1107,7 @@ int main (int argc, char *argv [])
 		printf ("Unable to locate or open Neverwinter Night\n");
 		exit (0);
 	}
-	
+/* Mord and Symphony
 	//
 	// If we are testing decompilation
 	//
@@ -1142,11 +1142,12 @@ int main (int argc, char *argv [])
 		printf ("*** NOTE: Test 4 is known to generate mismatchs\n");
 		printf ("    for 3 percent of all models\n");
 	}
-
+*/
 	//
 	// If we are to extract
 	//
 
+	/* Mord and Symphony
 	else if (g_fExtract)
 	{
 
@@ -1204,7 +1205,7 @@ int main (int argc, char *argv [])
 			printf ("Error: Unable to open input file \"%s\"\n", pszOrgInFile);
 			exit (0);
 		}
-	}
+	} */
 
 	//
 	// Otherwise, normal operation
