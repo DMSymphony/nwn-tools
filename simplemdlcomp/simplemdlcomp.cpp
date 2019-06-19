@@ -41,6 +41,7 @@
 #include "../_NmcLib/Nmc.h"
 #include "../_NwnLib/NwnModel.h"
 #include "../_NwnLib/NwnStdLoader.h"
+#include <sys/stat.h>
 
 #ifdef _WIN32
 #include <atlbase.h>
@@ -61,7 +62,7 @@ bool g_fExtract = false;
 bool g_fPurgeNullFaces = true;
 bool g_fDisableExtension = false;
 bool g_bNWNDir = false;
-bool g_bInclude = false;
+bool g_bInclude = true;
 int g_nTest = 0;
 
 //
@@ -465,7 +466,7 @@ const char *MakeOutFile (const char *pszInFile, const char *pszOutFile,
 	// If we need to process the extension
 	//
 
-	if (fDoExt)
+	/*if (fDoExt)
 	{
 
 		//
@@ -491,7 +492,7 @@ const char *MakeOutFile (const char *pszInFile, const char *pszOutFile,
 
 		if (fUseDefault)
 			strcat (szOutName, pszDefaultExt);
-	}
+	}*/
 	return pszOutFile;
 }
 
@@ -546,8 +547,8 @@ bool Compile (unsigned char *pauchData, UINT32 ulSize,
 	//
 
 	CNmcContext sCtx; //Mord and Symphony
-	// for (int i = 0; i < (int) g_sLoader .GetKeyFileCount (); i++)
-	//	sCtx .AddKeyFile (g_sLoader .GetNthKeyFile (i));
+	for (int i = 0; i < (int) g_sLoader .GetKeyFileCount (); i++)
+		sCtx .AddKeyFile (g_sLoader .GetNthKeyFile (i));
 	sCtx .SetCache (&g_sCache);
 	sCtx .SetPurgeNullFaces (g_fPurgeNullFaces);
 	CNwnMemoryStream *pStream = new 
@@ -635,7 +636,7 @@ bool Compile (unsigned char *pauchData, UINT32 ulSize,
 //
 //-----------------------------------------------------------------------------
 
-bool Decompile (unsigned char *pauchData, UINT32 ulSize, 
+/*bool Decompile (unsigned char *pauchData, UINT32 ulSize, 
 	const char *pszInFile, const char *pszOutFile)
 {
 
@@ -687,7 +688,7 @@ bool Decompile (unsigned char *pauchData, UINT32 ulSize,
 	fwrite (sStream .GetData (), sStream .GetPosition (), 1, pf);
 	fclose (pf);
 	return true;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 //
@@ -776,10 +777,10 @@ int Wildcard (const char *pszInFile, const char *pszOutFile)
 		// Compile/decompile
 		//
 
-		if (g_fCompile)
-			Compile (pauchData, ulSize, sFind .name, pszOutFile);
-		else
-			Decompile (pauchData, ulSize, sFind .name, pszOutFile);
+		//if (g_fCompile)
+		  Compile (pauchData, ulSize, sFind .name, pszOutFile);
+		//else
+			//Decompile (pauchData, ulSize, sFind .name, pszOutFile);
 		nCount++;
 	} while (_findnext (id, &sFind) >= 0);
 
@@ -805,10 +806,10 @@ int Wildcard (const char *pszInFile, const char *pszOutFile)
 	// Compile
 	//
 
-	if (g_fCompile)
-		Compile (pauchData, ulSize, pszInFile, pszOutFile);
-	else
-		Decompile (pauchData, ulSize, pszInFile, pszOutFile);
+	//if (g_fCompile)
+	Compile (pauchData, ulSize, pszInFile, pszOutFile);
+	//else
+		//Decompile (pauchData, ulSize, pszInFile, pszOutFile);
 	return 1;
 #endif
 }
@@ -889,16 +890,16 @@ bool MatchPattern (const char *pszString, const char *pszPattern)
 
 int main (int argc, char *argv [])
 {
-	char *pszOutFile = NULL;
-	char *pszNWNDir = NULL;
-	char *pszIncDir = NULL;
+	char *pszOutFile = "./Binary/";
+	char *pszNWNDir = "/tmp";
+	char *pszIncDir = ".";
 	char **papszInFiles = NULL;
 	int nInFileCount = 0;
 
 	//
 	// Enable leak checking
 	//
-
+    mkdir(pszOutFile, S_IRWXU);
 #ifdef _WIN32
 #if defined (_DEBUG)
 	_CrtSetDbgFlag (_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
@@ -952,13 +953,13 @@ int main (int argc, char *argv [])
 			{
 				switch (tolower (*p))
 				{
-					case 'd':
+					/*case 'd':
 						g_fCompile = false;
-						break;
+						break;*/
 					case 'c':
 						g_fCompile = true;
 						break;
-					case 'x':
+					/*case 'x':
 						g_fExtract = true;
 						break;
 					case 'n':
@@ -966,7 +967,7 @@ int main (int argc, char *argv [])
 						break;
 					case 'e':
 						g_fDisableExtension = true;
-						break;
+						break;*/
 					case 'i':
 					case 'I':
 						++skip;
@@ -1024,10 +1025,10 @@ int main (int argc, char *argv [])
 			break;
 		}
 #else
-		else if (g_bNWNDir && pszNWNDir == NULL)
+		/*else if (g_bNWNDir && pszNWNDir == NULL)
 		{
 			pszNWNDir = argv [i];
-		}
+		}*/
 		else
 		{
 			papszInFiles [nInFileCount++] = argv [i];
@@ -1035,7 +1036,7 @@ int main (int argc, char *argv [])
 #endif
 	}
 
-	if (pszNWNDir == NULL) {
+	/*if (pszNWNDir == NULL) {
 		if (g_bNWNDir) {
 			fError = true;
 			printf("No NWNDir given\n");
@@ -1051,17 +1052,17 @@ int main (int argc, char *argv [])
 				}
 			}
 		}
-	}
+	} */
 	//
 	// Check for using -e with no output
 	//
 
-	if (g_fDisableExtension && (pszOutFile == NULL && !g_fExtract))
+	/*if (g_fDisableExtension && (pszOutFile == NULL && !g_fExtract))
 	{
 		printf ("Error: To use -e, you must specify an output file or path\n");
 		printf ("       or be extracting files using the -x option.\n");
 		exit (0);
-	}
+	} */
 
 	//
 	// If there is an error, display the help
@@ -1102,15 +1103,13 @@ int main (int argc, char *argv [])
 	//
 	
 	printf("NWN MDL compiler initializing with NWNDIR = %s, IncludeDir = %s\n", pszNWNDir, pszIncDir);
-	if (!g_sLoader .Initialize (pszNWNDir, pszIncDir))
+	g_sLoader .Initialize (pszNWNDir, pszIncDir);
+	/*if (!g_sLoader .Initialize (pszNWNDir, pszIncDir))
 	{
 		printf ("Unable to locate or open Neverwinter Night\n");
 		exit (0);
-	}
-/* Mord and Symphony
-	//
-	// If we are testing decompilation
-	//
+	}*/
+
 
 	if (g_nTest == 1)
 	{
@@ -1119,9 +1118,12 @@ int main (int argc, char *argv [])
 		// Enum the models
 		//
 
-		EnumBinaryModels (Test1Callback);
+		//EnumBinaryModels (Test1Callback);
 	}
-
+/* Mord and Symphony
+	//
+	// If we are testing decompilation
+	//
 	//
 	// If we are testing compilation
 	//
