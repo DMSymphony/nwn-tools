@@ -407,6 +407,30 @@ const char *MakeOutFile (const char *pszInFile, const char *pszOutFile,
 	// If we don't have an output file name
 	//
 
+#ifdef __linux__	
+    //make output directory
+
+	if(pszOutFile == NULL)
+	{
+
+		strcpy (szOutName, pszInFile);
+		bool path = false;
+		for(int i = 0; i < strlen(pszInFile); i++)
+		{
+			if(pszInFile[i] == '/')
+			{
+				path = true;
+				break;
+			}			
+		}
+		if(path)
+			pszOutFile = strcat(dirname(szOutName), "/Binary/");
+		else
+			pszOutFile = "./Binary/";
+	
+		mkdir(pszOutFile, S_IRWXU);
+    }
+#endif	     
 	if (pszOutFile == NULL || pszOutFile [0] == 0)
 	{
 		static const char *pszExt = ".mdl.ascii";
@@ -890,7 +914,7 @@ bool MatchPattern (const char *pszString, const char *pszPattern)
 
 int main (int argc, char *argv [])
 {
-	char *pszOutFile = "./Binary/";
+	char *pszOutFile = NULL;
 	char *pszNWNDir = "/tmp";
 	char *pszIncDir = ".";
 	char **papszInFiles = NULL;
@@ -899,7 +923,7 @@ int main (int argc, char *argv [])
 	//
 	// Enable leak checking
 	//
-    mkdir(pszOutFile, S_IRWXU);
+
 #ifdef _WIN32
 #if defined (_DEBUG)
 	_CrtSetDbgFlag (_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
@@ -968,12 +992,13 @@ int main (int argc, char *argv [])
 					case 'e':
 						g_fDisableExtension = true;
 						break;*/
-					case 'i':
-					case 'I':
+#ifdef __linux__
+					case 'o':
+					case 'O':
 						++skip;
-						pszIncDir =  argv [i + skip];
-						g_bInclude = true;
- 
+						pszOutFile =  argv [i + skip];
+						//g_bInclude = true;
+						mkdir(pszOutFile, S_IRWXU);
 						/*
 						if (strSearchDirs == NULL)
 							strSearchDirs = new std::string(argv[i + skip]);
@@ -983,6 +1008,7 @@ int main (int argc, char *argv [])
 						}
 						*/
 						break;
+#endif
 				       case 't':
 						{
 							char c = p [1];
@@ -1074,27 +1100,18 @@ int main (int argc, char *argv [])
 #ifdef _WIN32
 		printf ("nwnmdlcomp [-cdxe] [-t#] infile [outfile]\n\n");
 #else
-		printf ("nwnmdlcomp [-cdxe] [-t#] [-i incdir] [-p nwndir] infile\n\n");
+		printf ("nwnmdlcomp [-i incdir] [-o outDirOrFile] infile\n\n");
 		printf ("  nwndir - directory where NWN is installed.\n");
 		printf ("  incdir - directory where all NWN scripts are located (can be dummy location).\n");
 #endif
 		printf ("  infile - name of the input file.\n");
 #ifdef _WIN32
 		printf ("  outfile - name of the output file.\n");
+#else
+		printf ("  -o - Out file or output directory. By default outputs to ./Binary/. If Specifying a directory end with /");
 #endif
-		printf ("  -c - Compile the model (default)\n");
-		printf ("  -d - Decompile the model (can't be used with -c)\n");
-		printf ("  -x - Extract model from NWN data files\n");
 		printf ("  -n - When compiling, don't remove empty faces\n");
-		printf ("  -e - Disable appended extension mode.  Only usable when an\n");
-		printf ("       output file name or path is specified or extracting\n");
-		printf ("       files from the NWN data files using -x.\n");	
 		printf ("  -i - Path to include dir is following non-switch argument\n");
-		printf ("  -p - Path to NWNDir is following non-switch argument\n");
-		printf ("  -t1 - Perform a decompilation test on all Bioware models\n");
-		printf ("  -t2 - Perform a decomp/recomp test on all Bioware models (absolute)\n");
-		printf ("  -t3 - Perform a decomp/recomp test on all Bioware models (relative)\n");
-		printf ("  -t4 - Perform a decomp/recomp test on all Bioware models (smoothing)\n");
 		exit (0);
 	}
 
