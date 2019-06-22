@@ -964,6 +964,16 @@ void NmcParseModel (CNmcContext *pCtx)
 						       pCtx ->GenerateError ("Unable to locate "
 							     "super model \"%s\"", szSuperModel);
 							}
+							else
+							{
+								pModel ->m_pSuperModel .SetData (pSuperModel);
+								pSuperModel ->AddRef ();
+							}			
+						}
+						else
+						{
+							pModel ->m_pSuperModel .SetData (pSuperModel);
+							pSuperModel ->AddRef ();
 						}	
 					}
 					else
