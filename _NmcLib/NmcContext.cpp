@@ -367,6 +367,8 @@ CNwnMdlModel *CNmcContext::LoadModel (const char *pszName)
 		for (int i = 0; i < (int) m_vpKeyFiles .GetCount (); i++)
 			sCtx .AddKeyFile (m_vpKeyFiles [i]);
 		sCtx .SetPurgeNullFaces (GetPurgeNullFaces ());
+		sCtx .SetHomeDir(GetHomeDir());
+		sCtx .SetIncludeDir(GetIncludeDir());
 
 		//
 		// Compile

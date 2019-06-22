@@ -537,7 +537,7 @@ const char *MakeOutFile (const char *pszInFile, const char *pszOutFile,
 //-----------------------------------------------------------------------------
 
 bool Compile (unsigned char *pauchData, UINT32 ulSize, 
-	const char *pszInFile, const char *pszOutFile)
+	const char *pszInFile, const char *pszOutFile, const char *pszIncDir)
 {
 	//
 	// Issue message
@@ -570,7 +570,7 @@ bool Compile (unsigned char *pauchData, UINT32 ulSize,
 	// Compile
 	//
 
-	CNmcContext sCtx; //Mord and Symphony
+	CNmcContext sCtx;
 	for (int i = 0; i < (int) g_sLoader .GetKeyFileCount (); i++)
 		sCtx .AddKeyFile (g_sLoader .GetNthKeyFile (i));
 	sCtx .SetCache (&g_sCache);
@@ -578,6 +578,10 @@ bool Compile (unsigned char *pauchData, UINT32 ulSize,
 	CNwnMemoryStream *pStream = new 
 		CNwnMemoryStream (pszInFile, pauchData, ulSize);
 	sCtx .AddStream (pStream);
+#ifdef __linux__
+	sCtx .SetHomeDir (pszInFile);
+	sCtx .SetIncludeDir (pszIncDir);
+#endif
 	NmcParseModelFile (&sCtx);
 
 	//
@@ -726,7 +730,7 @@ bool Compile (unsigned char *pauchData, UINT32 ulSize,
 //
 //-----------------------------------------------------------------------------
 
-int Wildcard (const char *pszInFile, const char *pszOutFile)
+int Wildcard (const char *pszInFile, const char *pszOutFile, const char *pszIncDir)
 {
 #ifdef _WIN32
 	struct _finddata_t sFind;
@@ -802,7 +806,7 @@ int Wildcard (const char *pszInFile, const char *pszOutFile)
 		//
 
 		//if (g_fCompile)
-		  Compile (pauchData, ulSize, sFind .name, pszOutFile);
+		  Compile (pauchData, ulSize, sFind .name, pszOutFile, pszIncDir);
 		//else
 			//Decompile (pauchData, ulSize, sFind .name, pszOutFile);
 		nCount++;
@@ -831,7 +835,7 @@ int Wildcard (const char *pszInFile, const char *pszOutFile)
 	//
 
 	//if (g_fCompile)
-	Compile (pauchData, ulSize, pszInFile, pszOutFile);
+	Compile (pauchData, ulSize, pszInFile, pszOutFile, pszIncDir);
 	//else
 		//Decompile (pauchData, ulSize, pszInFile, pszOutFile);
 	return 1;
@@ -915,8 +919,8 @@ bool MatchPattern (const char *pszString, const char *pszPattern)
 int main (int argc, char *argv [])
 {
 	char *pszOutFile = NULL;
-	char *pszNWNDir = "/tmp";
-	char *pszIncDir = ".";
+	char *pszNWNDir = NULL;
+	char *pszIncDir = NULL;
 	char **papszInFiles = NULL;
 	int nInFileCount = 0;
 
@@ -1007,6 +1011,11 @@ int main (int argc, char *argv [])
 							strSearchDirs->append(argv[i + skip]);
 						}
 						*/
+						break;
+					case 'i':
+					case 'I':
+						++skip;
+						pszIncDir =  argv [i + skip];
 						break;
 #endif
 				       case 't':
@@ -1247,20 +1256,20 @@ int main (int argc, char *argv [])
 			char *pszOrgInFile = papszInFiles [i];
 			char *pszInFile = papszInFiles [i];
 			char szInFile [512];
-			int nCount = Wildcard (pszInFile, pszOutFile);
+			int nCount = Wildcard (pszInFile, pszOutFile, pszIncDir);
 			if (nCount == 0 && g_fCompile)
 			{
 				strcpy (szInFile, pszOrgInFile);
 				strcat (szInFile, ".mdl.ascii");
 				pszInFile = szInFile;
-				nCount = Wildcard (pszInFile, pszOutFile);
+				nCount = Wildcard (pszInFile, pszOutFile, pszIncDir);
 			}
 			if (nCount == 0)
 			{
 				strcpy (szInFile, pszOrgInFile);
 				strcat (szInFile, ".mdl");
 				pszInFile = szInFile;
-				nCount = Wildcard (pszInFile, pszOutFile);
+				nCount = Wildcard (pszInFile, pszOutFile, pszIncDir);
 			}
 			if (nCount == 0)
 			{

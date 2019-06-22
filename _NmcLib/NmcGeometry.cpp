@@ -938,11 +938,33 @@ void NmcParseModel (CNmcContext *pCtx)
 
 				if (szSuperModel [0] != 0 && stricmp (szSuperModel, "NULL") != 0)
 				{
-					CNwnMdlModel *pSuperModel = pCtx ->LoadModel (szSuperModel);
-					if (pSuperModel == NULL)
+					const char *szFolder = pCtx -> GetHomeDir();
+					CNwnMdlModel *pSuperModel = NULL;
+					std::string szFileLocation;
+									if(szFolder != NULL)
 					{
-						pCtx ->GenerateError ("Unable to locate "
-							"super model \"%s\"", szSuperModel);
+						szFileLocation = szFolder;
+						szFileLocation += szSuperModel;
+					    pSuperModel = pCtx ->LoadModel (szFileLocation.c_str());
+					}	
+					if (pSuperModel == NULL) //nothing in home dir, try include
+					{
+						szFolder = pCtx -> GetIncludeDir();
+						if(szFolder != NULL)
+						{
+							szFileLocation = pCtx -> GetIncludeDir();
+							szFileLocation += szSuperModel;
+							pSuperModel = pCtx ->LoadModel (szFileLocation.c_str());
+						}					
+						if(pSuperModel == NULL)
+						{
+						    pSuperModel = pCtx ->LoadModel (szSuperModel); //working directory
+							if(pSuperModel == NULL)
+							{
+						       pCtx ->GenerateError ("Unable to locate "
+							     "super model \"%s\"", szSuperModel);
+							}
+						}	
 					}
 					else
 					{
