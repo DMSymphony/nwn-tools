@@ -578,10 +578,9 @@ bool Compile (unsigned char *pauchData, UINT32 ulSize,
 	CNwnMemoryStream *pStream = new 
 		CNwnMemoryStream (pszInFile, pauchData, ulSize);
 	sCtx .AddStream (pStream);
-#ifdef __linux__
 	sCtx .SetHomeDir (pszInFile);
 	sCtx .SetIncludeDir (pszIncDir);
-#endif
+
 	NmcParseModelFile (&sCtx);
 
 	//

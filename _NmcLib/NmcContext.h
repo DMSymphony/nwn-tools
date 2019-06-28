@@ -353,7 +353,7 @@ public:
 		m_pCache = pCache;
 	}
 
-#ifdef __linux__	
+	
 	void SetHomeDir(const char *pszInFile)
 	{
 		if(pszInFile == NULL)
@@ -389,7 +389,7 @@ public:
 	{
 		return m_pIncDir;
 	}
-#endif
+
 // @access Protected methods
 protected:
 
