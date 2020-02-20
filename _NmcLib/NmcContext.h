@@ -353,6 +353,43 @@ public:
 		m_pCache = pCache;
 	}
 
+	
+	void SetHomeDir(const char *pszInFile)
+	{
+		if(pszInFile == NULL)
+		{
+			m_pHomeDir = "NULL";
+		}	
+		else
+		{
+			m_pHomeDir = pszInFile;
+			int pos = m_pHomeDir.find_last_of("/");
+			if(pos >= m_pHomeDir.size())
+				m_pHomeDir = "NULL";
+			else
+				m_pHomeDir = m_pHomeDir.substr(0,pos+1);
+		}	
+	}
+	
+	const char *GetHomeDir() const
+	{
+
+		if(m_pHomeDir == "NULL")
+			return NULL;
+		
+		return m_pHomeDir.c_str();
+	}
+
+	void SetIncludeDir(const char *pszIncDir)
+	{
+		m_pIncDir = pszIncDir;
+	}
+	
+	const char *GetIncludeDir() const
+	{
+		return m_pIncDir;
+	}
+
 // @access Protected methods
 protected:
 
@@ -411,6 +448,12 @@ protected:
 	// @cmember Cache
 
 	CNmcCache				*m_pCache;
+	
+	// @cmember Home directory
+	std::string             m_pHomeDir;
+	
+	// @member Include Directory
+	const char             *m_pIncDir;
 };
 
 #endif // ETS_NMCCONTEXT_H
